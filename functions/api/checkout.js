@@ -1,13 +1,11 @@
-const PRODUCTS = {
+const PRICES = {
   email: {
-    name: 'A Personal Email from Amrit',
-    payment: 50,
-    monthly: 60,
-    yearly: 70,
+    payment: 'price_1TJ2znPBs6ogXsINtyesbeuF',
+    monthly: 'price_1TJ31BPBs6ogXsIN8EuDf2tZ',
+    yearly:  'price_1TJ31CPBs6ogXsINd0A6uBkr',
   },
   'emoji-email': {
-    name: 'A Personal Email from Amrit 🎉',
-    payment: 100,
+    payment: 'price_1TJ31CPBs6ogXsINknJb4pWZ',
   },
 };
 
@@ -25,10 +23,10 @@ export async function onRequestPost(context) {
   }
 
   const { product, mode } = body;
-  const productConfig = PRODUCTS[product];
+  const priceId = PRICES[product]?.[mode];
 
-  if (!productConfig) {
-    return new Response(JSON.stringify({ error: 'Unknown product' }), {
+  if (!priceId) {
+    return new Response(JSON.stringify({ error: 'Unknown product or mode' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -37,28 +35,9 @@ export async function onRequestPost(context) {
   const params = new URLSearchParams();
   params.append('success_url', 'https://www.amritsridhar.com/success');
   params.append('cancel_url', 'https://www.amritsridhar.com/cancel');
-  params.append('line_items[0][price_data][currency]', 'usd');
-  params.append('line_items[0][price_data][product_data][name]', productConfig.name);
+  params.append('line_items[0][price]', priceId);
   params.append('line_items[0][quantity]', '1');
-
-  if (mode === 'payment') {
-    params.append('mode', 'payment');
-    params.append('payment_method_types[]', 'card');
-    params.append('line_items[0][price_data][unit_amount]', String(productConfig.payment));
-  } else if (mode === 'monthly') {
-    params.append('mode', 'subscription');
-    params.append('line_items[0][price_data][unit_amount]', String(productConfig.monthly));
-    params.append('line_items[0][price_data][recurring][interval]', 'month');
-  } else if (mode === 'yearly') {
-    params.append('mode', 'subscription');
-    params.append('line_items[0][price_data][unit_amount]', String(productConfig.yearly));
-    params.append('line_items[0][price_data][recurring][interval]', 'year');
-  } else {
-    return new Response(JSON.stringify({ error: 'Unknown mode' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  params.append('mode', mode === 'payment' ? 'payment' : 'subscription');
 
   const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
