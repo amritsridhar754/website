@@ -1,3 +1,5 @@
+import Stripe from 'stripe';
+
 const PRICES = {
   email: {
     payment: 'price_1TJ2znPBs6ogXsINtyesbeuF',
@@ -32,30 +34,14 @@ export async function onRequestPost(context) {
     });
   }
 
-  const params = new URLSearchParams();
-  params.append('success_url', 'https://www.amritsridhar.com/success');
-  params.append('cancel_url', 'https://www.amritsridhar.com/cancel');
-  params.append('line_items[0][price]', priceId);
-  params.append('line_items[0][quantity]', '1');
-  params.append('mode', mode === 'payment' ? 'payment' : 'subscription');
+  const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
-  const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Basic ${btoa(env.STRIPE_SECRET_KEY + ':')}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: params.toString(),
+  const session = await stripe.checkout.sessions.create({
+    line_items: [{ price: priceId, quantity: 1 }],
+    mode: mode === 'payment' ? 'payment' : 'subscription',
+    success_url: 'https://www.amritsridhar.com/success',
+    cancel_url: 'https://www.amritsridhar.com/cancel',
   });
-
-  const session = await response.json();
-
-  if (!response.ok) {
-    return new Response(JSON.stringify({ error: session.error.message }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
 
   return new Response(JSON.stringify({ url: session.url }), {
     headers: { 'Content-Type': 'application/json' },
