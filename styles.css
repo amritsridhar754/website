@@ -101,14 +101,24 @@ h1 {
   transform: scale(0.98);
 }
 
-.buy-button.secondary {
-  background: #fff;
-  color: #1a1a1a;
-  border: 1px solid #e5e5e5;
+.buy-button.monthly {
+  background: #1a6fd4;
+  color: #fff;
+  border: none;
 }
 
-.buy-button.secondary:hover {
-  background: #f5f5f5;
+.buy-button.monthly:hover {
+  background: #1559aa;
+}
+
+.buy-button.yearly {
+  background: #d41a1a;
+  color: #fff;
+  border: none;
+}
+
+.buy-button.yearly:hover {
+  background: #aa1515;
 }
 
 .product-card + .product-card {
