@@ -5,7 +5,7 @@ export async function onRequestPost(context) {
   params.append('payment_method_types[]', 'card');
   params.append('line_items[0][price_data][currency]', 'usd');
   params.append('line_items[0][price_data][product_data][name]', 'A Personal Email from Amrit');
-  params.append('line_items[0][price_data][unit_amount]', '1');
+  params.append('line_items[0][price_data][unit_amount]', '50');
   params.append('line_items[0][quantity]', '1');
   params.append('mode', 'payment');
   params.append('success_url', 'https://www.amritsridhar.com/success');
