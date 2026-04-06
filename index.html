@@ -26,5 +26,28 @@
   <footer>
     <p>© 2026 amritsridhar.com</p>
   </footer>
+  <script>
+    document.getElementById('buy-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('buy-btn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+
+      try {
+        const res = await fetch('/api/checkout', { method: 'POST' });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert('Something went wrong. Please try again.');
+          btn.disabled = false;
+          btn.textContent = 'Buy Now';
+        }
+      } catch (e) {
+        alert('Something went wrong. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Buy Now';
+      }
+    });
+  </script>
 </body>
 </html>
