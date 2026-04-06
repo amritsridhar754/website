@@ -11,15 +11,27 @@
     <section class="hero">
       <h1>A Personal Email from Amrit</h1>
       <p class="tagline">You'll receive a handwritten email from me personally saying "hi".</p>
+
       <div class="product-card">
         <div class="product-details">
           <span class="product-name">The Email</span>
-          <span class="product-price">$0.50</span>
+          <span class="product-price">from $0.50</span>
         </div>
-        <p class="product-description">
-          One email. One word. Maximum sincerity.
-        </p>
-        <button class="buy-button" id="buy-btn">Buy Now</button>
+        <p class="product-description">One email. One word. Maximum sincerity.</p>
+        <div class="button-group">
+          <button class="buy-button" onclick="checkout('email', 'payment')">Buy Once — $0.50</button>
+          <button class="buy-button secondary" onclick="checkout('email', 'monthly')">Monthly — $0.60/mo</button>
+          <button class="buy-button secondary" onclick="checkout('email', 'yearly')">Yearly — $0.70/yr</button>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-details">
+          <span class="product-name">The Email with Emoji</span>
+          <span class="product-price">$1.00</span>
+        </div>
+        <p class="product-description">Same email. Added flair. Worth every cent.</p>
+        <button class="buy-button" onclick="checkout('emoji-email', 'payment')">Buy Now — $1.00</button>
       </div>
     </section>
   </main>
@@ -27,27 +39,32 @@
     <p>© 2026 amritsridhar.com</p>
   </footer>
   <script>
-    document.getElementById('buy-btn').addEventListener('click', async () => {
-      const btn = document.getElementById('buy-btn');
+    async function checkout(product, mode) {
+      const btn = event.currentTarget;
       btn.disabled = true;
+      const originalText = btn.textContent;
       btn.textContent = 'Loading...';
 
       try {
-        const res = await fetch('/api/checkout', { method: 'POST' });
+        const res = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product, mode }),
+        });
         const data = await res.json();
         if (data.url) {
           window.location.href = data.url;
         } else {
           alert('Something went wrong. Please try again.');
           btn.disabled = false;
-          btn.textContent = 'Buy Now';
+          btn.textContent = originalText;
         }
       } catch (e) {
         alert('Something went wrong. Please try again.');
         btn.disabled = false;
-        btn.textContent = 'Buy Now';
+        btn.textContent = originalText;
       }
-    });
+    }
   </script>
 </body>
 </html>
